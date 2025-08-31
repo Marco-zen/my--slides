@@ -1,0 +1,32 @@
+name: Build slides with Marp
+
+on:
+  push:
+    paths:
+      - "slides.md"   # Only run when slides.md changes（仅 slides.md 改变时运行）
+  workflow_dispatch:   # Allow manual run（允许手动运行）
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js（安装 Node.js）
+        uses: actions/setup-node@v4
+
+      - name: Install Marp CLI（安装 Marp 命令行）
+        run: npm install -g @marp-team/marp-cli
+
+      - name: Build slides（生成 PPTX / PDF / HTML）
+        run: |
+          mkdir -p dist
+          marp slides.md --pptx -o dist/slides.pptx
+          marp slides.md --pdf  -o dist/slides.pdf
+          marp slides.md --html -o dist/index.html
+
+      - name: Upload artifacts（上传构建产物，便于下载）
+        uses: actions/upload-artifact@v4
+        with:
+          name: slides
+          path: dist/
