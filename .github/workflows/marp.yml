@@ -1,0 +1,33 @@
+name: Build slides with Marp
+
+on:
+  push:
+    paths:
+      - "slides.md"
+      - ".github/workflows/marp.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+
+      - name: Install Marp CLI
+        run: npm install -g @marp-team/marp-cli
+
+      - name: Build slides
+        run: |
+          mkdir -p dist
+          marp slides.md --pptx -o dist/slides.pptx
+          marp slides.md --pdf  -o dist/slides.pdf
+          marp slides.md --html -o dist/index.html
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: slides
+          path: dist/
